@@ -1,11 +1,25 @@
+const dns = require("dns");
+
+dns.setServers([
+    "8.8.8.8",
+    "1.1.1.1"
+]);
+
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
-require("dotenv").config();
+const path = require("path");
+
+// Root .env load karo
+require("dotenv").config({
+    path: path.resolve(__dirname, "../.env")
+});
 
 const User = require("../models/User");
 
 const createAdmin = async () => {
     try {
+        console.log("MONGO_URI loaded:", !!process.env.MONGO_URI);
+
         await mongoose.connect(process.env.MONGO_URI);
 
         console.log("MongoDB connected");
@@ -48,12 +62,7 @@ const createAdmin = async () => {
         process.exit(0);
 
     } catch (error) {
-
-        console.error(
-            "Admin creation failed:",
-            error
-        );
-
+        console.error("Admin creation failed:", error);
         process.exit(1);
     }
 };
