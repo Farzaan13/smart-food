@@ -7,7 +7,6 @@ const Notification = require("../models/Notification");
 
 const getDashboard = async (req, res) => {
 try {
-
     const deliveries = await FoodRequest
         .find({
             deliveryPerson: req.user._id,

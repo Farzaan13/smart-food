@@ -1,141 +1,305 @@
 <div class="container py-5">
 
-    <!-- ============================= -->
+    <!-- =============================== -->
     <!-- HEADER -->
-    <!-- ============================= -->
+    <!-- =============================== -->
 
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
 
         <div>
             <h1 class="fw-bold mb-1">
-                Surplus Food
+                🍱 Surplus Food
             </h1>
 
             <p class="text-muted mb-0">
-                Make extra food available for redistribution.
+                Manage and publish surplus food available for redistribution.
             </p>
         </div>
 
-        <div class="d-flex gap-2 mt-3 mt-md-0">
+        <button
+            type="button"
+            class="btn btn-success px-4"
+            data-bs-toggle="modal"
+            data-bs-target="#addSurplusModal">
 
-            <a
-                href="/dashboard/kitchen"
-                class="btn btn-outline-secondary">
+            + Add Surplus Food
 
-                ← Dashboard
+        </button>
 
-            </a>
+    </div>
 
-            <button
-                type="button"
-                class="btn btn-success"
-                data-bs-toggle="modal"
-                data-bs-target="#surplusModal">
 
-                + Add Surplus
+    <!-- =============================== -->
+    <!-- STATISTICS -->
+    <!-- =============================== -->
 
-            </button>
+    <div class="row g-4 mb-5">
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Total Listings
+                    </small>
+
+                    <h2 class="fw-bold mb-0">
+                        <%= surplusFoods ? surplusFoods.length : 0 %>
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Available
+                    </small>
+
+                    <h2 class="fw-bold text-success mb-0">
+
+                        <%= surplusFoods
+                            ? surplusFoods.filter(food => food.status === "available").length
+                            : 0
+                        %>
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Requested
+                    </small>
+
+                    <h2 class="fw-bold text-warning mb-0">
+
+                        <%= surplusFoods
+                            ? surplusFoods.filter(food => food.status === "requested").length
+                            : 0
+                        %>
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Completed
+                    </small>
+
+                    <h2 class="fw-bold text-primary mb-0">
+
+                        <%= surplusFoods
+                            ? surplusFoods.filter(food => food.status === "completed").length
+                            : 0
+                        %>
+
+                    </h2>
+
+                </div>
+
+            </div>
 
         </div>
 
     </div>
 
 
-    <!-- ============================= -->
-    <!-- LISTINGS -->
-    <!-- ============================= -->
+    <!-- =============================== -->
+    <!-- SURPLUS FOOD LIST -->
+    <!-- =============================== -->
 
-    <div class="row g-4">
+    <div class="mb-3">
 
-        <% if (!surplusFoods || surplusFoods.length === 0) { %>
+        <h3 class="fw-bold mb-1">
+            My Surplus Food
+        </h3>
 
-            <div class="col-12">
+        <p class="text-muted">
+            Food listings created by your kitchen.
+        </p>
 
-                <div class="card border-0 shadow-sm">
+    </div>
 
-                    <div class="card-body text-center py-5">
 
-                        <div class="mb-3">
-                            <span style="font-size: 3rem;">🍱</span>
-                        </div>
+    <% if (!surplusFoods || surplusFoods.length === 0) { %>
 
-                        <h5 class="fw-bold">
-                            No surplus food listed
-                        </h5>
+        <div class="card border-0 shadow-sm">
 
-                        <p class="text-muted mb-4">
-                            Add available surplus food for NGOs
-                            and community kitchens.
-                        </p>
+            <div class="card-body text-center py-5">
 
-                        <button
-                            type="button"
-                            class="btn btn-success"
-                            data-bs-toggle="modal"
-                            data-bs-target="#surplusModal">
-
-                            + Add Your First Surplus
-
-                        </button>
-
-                    </div>
-
+                <div style="font-size: 4rem;">
+                    🍱
                 </div>
+
+                <h5 class="fw-bold mt-3">
+                    No surplus food yet
+                </h5>
+
+                <p class="text-muted">
+                    Add your first surplus food listing to make it available
+                    for redistribution.
+                </p>
+
+                <button
+                    type="button"
+                    class="btn btn-success"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addSurplusModal">
+
+                    + Add Surplus Food
+
+                </button>
 
             </div>
 
-        <% } %>
+        </div>
+
+    <% } else { %>
 
 
-        <% if (surplusFoods && surplusFoods.length > 0) { %>
+        <div class="row g-4">
 
             <% surplusFoods.forEach(food => { %>
 
                 <div class="col-md-6 col-lg-4">
 
-                    <div class="card h-100 border-0 shadow-sm">
+                    <div class="card border-0 shadow-sm h-100 overflow-hidden">
+
+                        <!-- =============================== -->
+                        <!-- FOOD IMAGE -->
+                        <!-- =============================== -->
+
+                        <% if (food.image && food.image.url) { %>
+
+                            <img
+                                src="<%= food.image.url %>"
+                                class="card-img-top"
+                                alt="<%= food.foodName %>"
+                                style="height:220px; object-fit:cover;"
+                            >
+
+                        <% } else { %>
+
+                            <div
+                                class="bg-light d-flex align-items-center justify-content-center"
+                                style="height:220px; font-size:4rem;"
+                            >
+                                🍱
+                            </div>
+
+                        <% } %>
+
 
                         <div class="card-body d-flex flex-column">
 
-                            <!-- Food Name + Status -->
+                            <!-- FOOD NAME -->
 
                             <div class="d-flex justify-content-between align-items-start mb-2">
 
                                 <h5 class="fw-bold mb-0">
-
                                     <%= food.foodName %>
-
                                 </h5>
 
-                                <span class="badge
-                                    <%= food.status === 'available'
-                                        ? 'bg-success'
-                                        : food.status === 'requested'
-                                        ? 'bg-warning text-dark'
-                                        : 'bg-secondary' %>">
 
-                                    <%= food.status.replaceAll("_", " ") %>
+                                <!-- STATUS -->
 
-                                </span>
+                                <% if (food.status === "available") { %>
+
+                                    <span class="badge bg-success">
+                                        Available
+                                    </span>
+
+                                <% } else if (food.status === "requested") { %>
+
+                                    <span class="badge bg-warning text-dark">
+                                        Requested
+                                    </span>
+
+                                <% } else if (food.status === "assigned") { %>
+
+                                    <span class="badge bg-info text-dark">
+                                        Assigned
+                                    </span>
+
+                                <% } else if (food.status === "picked_up") { %>
+
+                                    <span class="badge bg-primary">
+                                        Picked Up
+                                    </span>
+
+                                <% } else if (food.status === "completed") { %>
+
+                                    <span class="badge bg-primary">
+                                        Completed
+                                    </span>
+
+                                <% } else if (food.status === "expired") { %>
+
+                                    <span class="badge bg-secondary">
+                                        Expired
+                                    </span>
+
+                                <% } else if (food.status === "cancelled") { %>
+
+                                    <span class="badge bg-danger">
+                                        Cancelled
+                                    </span>
+
+                                <% } %>
 
                             </div>
 
 
-                            <!-- Category -->
+                            <!-- CATEGORY -->
 
                             <p class="text-muted text-capitalize mb-3">
 
-                                <%= food.category.replaceAll("_", " ") %>
+                                <%= food.category
+                                    ? food.category.replaceAll("_", " ")
+                                    : "Food"
+                                %>
 
                             </p>
 
 
-                            <!-- Quantity -->
+                            <!-- QUANTITY -->
 
                             <div class="mb-3">
 
                                 <small class="text-muted">
-                                    Available Quantity
+                                    Quantity
                                 </small>
 
                                 <h3 class="fw-bold text-success mb-0">
@@ -151,15 +315,13 @@
                             <hr>
 
 
-                            <!-- Prepared Time -->
+                            <!-- PREPARED AT -->
 
                             <p class="mb-2">
 
                                 <strong>
                                     Prepared:
                                 </strong>
-
-                                <br>
 
                                 <span class="text-muted">
 
@@ -172,12 +334,12 @@
                             </p>
 
 
-                            <!-- Pickup Deadline -->
+                            <!-- PICKUP DEADLINE -->
 
                             <p class="mb-2">
 
                                 <strong>
-                                    Pickup before:
+                                    Pickup Before:
                                 </strong>
 
                                 <br>
@@ -193,7 +355,7 @@
                             </p>
 
 
-                            <!-- Location -->
+                            <!-- CITY -->
 
                             <p class="mb-2">
 
@@ -208,7 +370,7 @@
                             </p>
 
 
-                            <!-- Pickup Address -->
+                            <!-- ADDRESS -->
 
                             <p class="mb-2">
 
@@ -219,36 +381,24 @@
                                 <br>
 
                                 <span class="text-muted">
-
                                     <%= food.pickupAddress %>
-
                                 </span>
 
                             </p>
 
 
-                            <!-- Description -->
+                            <!-- DESCRIPTION -->
 
                             <% if (food.description) { %>
 
-                                <div class="mt-2 mb-3">
-
-                                    <strong>
-                                        Description:
-                                    </strong>
-
-                                    <p class="text-muted mb-0">
-
-                                        <%= food.description %>
-
-                                    </p>
-
-                                </div>
+                                <p class="text-muted small mb-3">
+                                    <%= food.description %>
+                                </p>
 
                             <% } %>
 
 
-                            <!-- Actions -->
+                            <!-- ACTIONS -->
 
                             <div class="mt-auto pt-3">
 
@@ -256,11 +406,14 @@
 
                                     <form
                                         action="/dashboard/kitchen/surplus/<%= food._id %>/cancel"
-                                        method="POST">
+                                        method="POST"
+                                        onsubmit="return confirm('Are you sure you want to cancel this food listing?');"
+                                    >
 
                                         <button
                                             type="submit"
-                                            class="btn btn-outline-danger btn-sm w-100">
+                                            class="btn btn-outline-danger w-100"
+                                        >
 
                                             Cancel Listing
 
@@ -270,18 +423,15 @@
 
                                 <% } else { %>
 
-                                    <div class="alert alert-light border mb-0">
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-secondary w-100"
+                                        disabled
+                                    >
 
-                                        <small class="text-muted">
+                                        Listing <%= food.status.replaceAll("_", " ") %>
 
-                                            This listing is currently
-                                            <strong>
-                                                <%= food.status.replaceAll("_", " ") %>
-                                            </strong>.
-
-                                        </small>
-
-                                    </div>
+                                    </button>
 
                                 <% } %>
 
@@ -295,108 +445,107 @@
 
             <% }) %>
 
-        <% } %>
+        </div>
 
-    </div>
+    <% } %>
 
 </div>
 
 
 
-<!-- ===================================================== -->
+<!-- ================================================= -->
 <!-- ADD SURPLUS FOOD MODAL -->
-<!-- ===================================================== -->
+<!-- ================================================= -->
 
 <div
     class="modal fade"
-    id="surplusModal"
+    id="addSurplusModal"
     tabindex="-1"
-    aria-labelledby="surplusModalLabel"
-    aria-hidden="true">
+    aria-labelledby="addSurplusModalLabel"
+    aria-hidden="true"
+>
 
     <div class="modal-dialog modal-lg modal-dialog-centered">
 
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow">
 
 
-            <!-- Modal Header -->
+            <!-- MODAL HEADER -->
 
-            <div class="modal-header">
+            <div class="modal-header bg-success text-white">
 
                 <div>
 
                     <h5
                         class="modal-title fw-bold"
-                        id="surplusModalLabel">
+                        id="addSurplusModalLabel"
+                    >
 
-                        Add Surplus Food
+                        🍱 Add Surplus Food
 
                     </h5>
 
-                    <small class="text-muted">
-
-                        Add extra food available for redistribution.
-
+                    <small>
+                        Publish food available for redistribution.
                     </small>
 
                 </div>
 
                 <button
                     type="button"
-                    class="btn-close"
+                    class="btn-close btn-close-white"
                     data-bs-dismiss="modal"
-                    aria-label="Close">
-                </button>
+                    aria-label="Close"
+                ></button>
 
             </div>
 
 
-            <!-- Form -->
+            <!-- FORM -->
 
             <form
                 action="/dashboard/kitchen/surplus"
                 method="POST"
-                 id="surplusForm">
+                enctype="multipart/form-data"
+            >
 
                 <div class="modal-body">
 
                     <div class="row g-3">
 
 
-                        <!-- Food Name -->
+                        <!-- FOOD NAME -->
 
-                        <div class="col-md-6">
+                        <div class="col-md-8">
 
                             <label class="form-label fw-semibold">
-
                                 Food Name
-
                             </label>
 
                             <input
                                 type="text"
                                 name="foodName"
                                 class="form-control"
-                                placeholder="e.g. Vegetable Rice"
-                                required>
+                                placeholder="e.g. Vegetable Biryani"
+                                required
+                            >
 
                         </div>
 
 
-                        <!-- Category -->
+                        <!-- CATEGORY -->
 
-                        <div class="col-md-6">
+                        <div class="col-md-4">
 
                             <label class="form-label fw-semibold">
-
                                 Category
-
                             </label>
 
                             <select
                                 name="category"
                                 class="form-select"
-                                required>
+                                required
+                            >
 
                                 <option value="cooked_food">
                                     Cooked Food
@@ -427,42 +576,40 @@
                         </div>
 
 
-                        <!-- Quantity -->
+                        <!-- QUANTITY -->
 
                         <div class="col-md-6">
 
                             <label class="form-label fw-semibold">
-
                                 Quantity
-
                             </label>
 
                             <input
                                 type="number"
                                 name="quantity"
                                 class="form-control"
-                                placeholder="e.g. 50"
-                                min="1"
+                                min="0.1"
                                 step="0.1"
-                                required>
+                                placeholder="Enter quantity"
+                                required
+                            >
 
                         </div>
 
 
-                        <!-- Unit -->
+                        <!-- UNIT -->
 
                         <div class="col-md-6">
 
                             <label class="form-label fw-semibold">
-
                                 Unit
-
                             </label>
 
                             <select
                                 name="unit"
                                 class="form-select"
-                                required>
+                                required
+                            >
 
                                 <option value="plates">
                                     Plates
@@ -485,53 +632,67 @@
                         </div>
 
 
-                        <!-- Prepared At -->
+                        <!-- PREPARED AT -->
 
                         <div class="col-md-6">
 
                             <label class="form-label fw-semibold">
-
                                 Prepared At
-
                             </label>
 
                             <input
                                 type="datetime-local"
                                 name="preparedAt"
                                 class="form-control"
-                                required>
+                                required
+                            >
 
                         </div>
 
 
-                        <!-- Pickup Deadline -->
+                        <!-- PICKUP DEADLINE -->
 
                         <div class="col-md-6">
 
                             <label class="form-label fw-semibold">
-
                                 Pickup Deadline
-
                             </label>
 
                             <input
                                 type="datetime-local"
                                 name="pickupDeadline"
-                                id="pickupDeadline"
                                 class="form-control"
-                                required>
+                                required
+                            >
 
                         </div>
 
 
-                        <!-- City -->
+                        <!-- PICKUP ADDRESS -->
 
-                        <div class="col-md-6">
+                        <div class="col-md-8">
 
                             <label class="form-label fw-semibold">
+                                Pickup Address
+                            </label>
 
+                            <input
+                                type="text"
+                                name="pickupAddress"
+                                class="form-control"
+                                placeholder="Enter pickup address"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- CITY -->
+
+                        <div class="col-md-4">
+
+                            <label class="form-label fw-semibold">
                                 City
-
                             </label>
 
                             <input
@@ -539,73 +700,106 @@
                                 name="city"
                                 class="form-control"
                                 placeholder="e.g. Kanpur"
-                                required>
+                                required
+                            >
 
                         </div>
 
 
-                        <!-- Pickup Address -->
-
-                        <div class="col-md-6">
-
-                            <label class="form-label fw-semibold">
-
-                                Pickup Address
-
-                            </label>
-
-                            <input
-                                type="text"
-                                name="pickupAddress"
-                                class="form-control"
-                                placeholder="Kitchen pickup address"
-                                required>
-
-                        </div>
-
-
-                        <!-- Description -->
+                        <!-- DESCRIPTION -->
 
                         <div class="col-12">
 
                             <label class="form-label fw-semibold">
-
                                 Description
-
                             </label>
 
                             <textarea
                                 name="description"
                                 class="form-control"
                                 rows="3"
-                                placeholder="Food details, packaging, quantity details, etc."></textarea>
+                                placeholder="Describe the food, freshness, packaging, etc."
+                            ></textarea>
 
                         </div>
+
+
+                        <!-- FOOD IMAGE -->
+
+                        <div class="col-12">
+
+                            <label class="form-label fw-semibold">
+                                Food Photo
+                            </label>
+
+                            <input
+                                type="file"
+                                name="image"
+                                id="foodImage"
+                                class="form-control"
+                                accept="image/jpeg,image/png,image/webp"
+                                required
+                            >
+
+                            <small class="text-muted">
+                                JPG, PNG or WEBP. Maximum size: 5 MB.
+                            </small>
+
+                        </div>
+
+
+                        <!-- IMAGE PREVIEW -->
+
+                        <div
+                            class="col-12 d-none"
+                            id="imagePreviewContainer"
+                        >
+
+                            <div class="mt-2">
+
+                                <p class="fw-semibold mb-2">
+                                    Image Preview
+                                </p>
+
+                                <img
+                                    id="imagePreview"
+                                    src=""
+                                    alt="Food Preview"
+                                    class="img-fluid rounded shadow-sm"
+                                    style="
+                                        max-height:250px;
+                                        object-fit:cover;
+                                    "
+                                >
+
+                            </div>
+
+                        </div>
+
 
                     </div>
 
                 </div>
 
 
-                <!-- Modal Footer -->
+                <!-- MODAL FOOTER -->
 
                 <div class="modal-footer">
 
                     <button
                         type="button"
                         class="btn btn-secondary"
-                        data-bs-dismiss="modal">
-
+                        data-bs-dismiss="modal"
+                    >
                         Cancel
-
                     </button>
-
 
                     <button
                         type="submit"
-                        class="btn btn-success">
+                        class="btn btn-success px-4"
+                    >
 
-                        + Add Surplus Food
+                        🍱 Publish Surplus Food
 
                     </button>
 
@@ -619,72 +813,97 @@
 
 </div>
 
+
+<!-- ================================================= -->
+<!-- IMAGE PREVIEW SCRIPT -->
+<!-- ================================================= -->
+
 <script>
-document.addEventListener("DOMContentLoaded", () => {
 
-    const form = document.getElementById("surplusForm");
+    const foodImage = document.getElementById("foodImage");
 
-    const preparedAt = document.getElementById("preparedAt");
-    const pickupDeadline = document.getElementById("pickupDeadline");
+    const imagePreview =
+        document.getElementById("imagePreview");
 
-    // Current date-time ko input ke format me convert karta hai
-    const now = new Date();
+    const imagePreviewContainer =
+        document.getElementById("imagePreviewContainer");
 
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
 
-    const currentDateTime =
-        `${year}-${month}-${day}T${hours}:${minutes}`;
+    if (foodImage) {
 
-    // Prepared date future se bahut invalid na ho
-    preparedAt.max = currentDateTime;
+        foodImage.addEventListener("change", function () {
 
-    form.addEventListener("submit", (event) => {
+            const file = this.files[0];
 
-        const preparedDate = new Date(preparedAt.value);
-        const deadlineDate = new Date(pickupDeadline.value);
+            if (!file) {
 
-        // Invalid date check
-        if (isNaN(preparedDate.getTime())) {
+                imagePreviewContainer.classList.add("d-none");
 
-            event.preventDefault();
+                imagePreview.src = "";
 
-            alert("Please enter a valid Prepared At date.");
+                return;
 
-            preparedAt.focus();
+            }
 
-            return;
-        }
 
-        if (isNaN(deadlineDate.getTime())) {
+            // File size validation
 
-            event.preventDefault();
+            if (file.size > 5 * 1024 * 1024) {
 
-            alert("Please enter a valid Pickup Deadline.");
+                alert("Image size must be less than 5 MB.");
 
-            pickupDeadline.focus();
+                this.value = "";
 
-            return;
-        }
+                imagePreviewContainer.classList.add("d-none");
 
-        // Pickup deadline prepared time ke baad honi chahiye
-        if (deadlineDate <= preparedDate) {
+                return;
 
-            event.preventDefault();
+            }
 
-            alert(
-                "Pickup Deadline must be later than Prepared At."
-            );
 
-            pickupDeadline.focus();
+            // File type validation
 
-            return;
-        }
+            const allowedTypes = [
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            ];
 
-    });
 
-});
+            if (!allowedTypes.includes(file.type)) {
+
+                alert(
+                    "Only JPG, PNG and WEBP images are allowed."
+                );
+
+                this.value = "";
+
+                imagePreviewContainer.classList.add("d-none");
+
+                return;
+
+            }
+
+
+            // Preview
+
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+
+                imagePreview.src =
+                    event.target.result;
+
+                imagePreviewContainer.classList.remove(
+                    "d-none"
+                );
+
+            };
+
+            reader.readAsDataURL(file);
+
+        });
+
+    }
+
 </script>

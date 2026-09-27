@@ -18,6 +18,8 @@ const predictionRoutes =
 const surplusPlanRoutes = require("./routes/surplusPlanRoutes");
 const notificationRoutes =
     require("./routes/notificationRoutes");
+    const profileRoutes =
+    require("./routes/profileRoutes");
 
 const app = express();
 
@@ -128,6 +130,12 @@ app.get("/", (req, res) => {
 
 });
 
+app.get("/how-it-works", (req, res) => {
+    res.render("how-it-works", {
+        title: "How It Works - SmartFood AI"
+    });
+});
+
 
 app.get("/register", (req, res) => {
 
@@ -145,6 +153,11 @@ app.get("/login", (req, res) => {
     });
 
 });
+
+app.use(
+    "/profile",
+    profileRoutes
+);
 
 
 // ===============================

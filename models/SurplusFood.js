@@ -54,6 +54,16 @@ const surplusFoodSchema = new mongoose.Schema(
             trim: true
         },
 
+      image: {
+            url: {
+                type: String,
+                default: ""
+            },
+            filename: {
+                type: String,
+                default: ""
+            }
+        },
         pickupAddress: {
             type: String,
             required: true,

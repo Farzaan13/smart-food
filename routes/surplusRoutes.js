@@ -1,5 +1,6 @@
 const express = require("express");
 
+
 const router = express.Router();
 
 const {
@@ -12,6 +13,8 @@ const {
     createSurplusFood,
     cancelSurplusFood
 } = require("../controllers/surplusController");
+
+const upload = require("../middleware/uploadMiddleware");
 
 
 router.get(
@@ -26,6 +29,7 @@ router.post(
     "/",
     requireAuth,
     requireRole("kitchen"),
+    upload.single("image"),
     createSurplusFood
 );
 

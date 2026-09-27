@@ -1,4 +1,5 @@
 const SurplusFood = require("../models/SurplusFood");
+const cloudinary = require("../config/cloudinary");
 
 const getSurplusPage = async (req, res) => {
     try {
@@ -34,6 +35,8 @@ const getSurplusPage = async (req, res) => {
 const createSurplusFood = async (req, res) => {
 
     try {
+
+        console.log("FILE:", req.file);
 
         const {
             foodName,
@@ -115,10 +118,44 @@ const createSurplusFood = async (req, res) => {
             );
         }
 
+        let imageData = {
+            url: "",
+            filename: ""
+        };
+
+        if (req.file) {
+
+            const result = await new Promise((resolve, reject) => {
+
+                const stream = cloudinary.uploader.upload_stream(
+                    {
+                        folder: "smart-food-ai/surplus-food"
+                    },
+                    (error, result) => {
+
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(result);
+                        }
+
+                    }
+                );
+
+                stream.end(req.file.buffer);
+            });
+
+            imageData = {
+                url: result.secure_url,
+                filename: result.public_id
+            };
+        }
+
 
         // =========================
         // CREATE SURPLUS
         // =========================
+        console.log("IMAGE DATA:", imageData);
 
         await SurplusFood.create({
 
@@ -143,6 +180,11 @@ const createSurplusFood = async (req, res) => {
             pickupAddress: pickupAddress.trim(),
 
             city: city.trim(),
+
+            image: {
+                url: imageData.url,
+                filename: imageData.filename
+            },
 
             status: "available"
 
