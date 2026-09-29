@@ -11,20 +11,20 @@ RUN apt-get update && apt-get install -y \
 # 3. Set the working directory inside the server
 WORKDIR /app
 
-# 4. Create a Python virtual environment and add it to the system PATH
-RUN python3 -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-
-# 5. Copy your Node package files and install JS dependencies
+# 4. Copy your Node package files and install JS dependencies
 COPY package*.json ./
 RUN npm install
 
-# 6. Copy all your project files (including the /ml folder and models)
+# 5. Copy all your project files (including the /ml folder and models)
 COPY . .
+
+# 6. Create the virtual environment EXACTLY where Node.js expects it
+RUN python3 -m venv /app/venv
+ENV PATH="/app/venv/bin:$PATH"
 
 # 7. Install your Python ML dependencies
 RUN pip install -r requirements.txt
 
 # 8. Start your Node.js application 
-# (Check your package.json. If you normally run 'node server.js', leave this as is)
+# (Leave this as server.js since that is your main file)
 CMD ["node", "server.js"]
