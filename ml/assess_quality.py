@@ -1,4 +1,3 @@
-# ml/assess_quality.py
 import sys
 import json
 import requests
@@ -8,12 +7,15 @@ import torchvision.transforms as transforms
 import torch
 import torchvision.models as models
 
-def assess_food_quality(image_url):
+def assess_food_quality(image_path_or_url):
     try:
-        # 1. Download the image from Cloudinary URL
-        response = requests.get(image_url, timeout=10)
-        response.raise_for_status()
-        img = Image.open(BytesIO(response.content)).convert('RGB')
+        # 1. Load the image (Handles both Web URLs and Local File Paths)
+        if image_path_or_url.startswith('http://') or image_path_or_url.startswith('https://'):
+            response = requests.get(image_path_or_url, timeout=10)
+            response.raise_for_status()
+            img = Image.open(BytesIO(response.content)).convert('RGB')
+        else:
+            img = Image.open(image_path_or_url).convert('RGB')
 
         # 2. Preprocess for the vision model
         transform = transforms.Compose([
@@ -34,19 +36,47 @@ def assess_food_quality(image_url):
             output = model(batch_t)
 
         # 5. Map visual features to freshness categories
-        # (For hackathon purposes, we use a deterministic heuristic based on tensor mean)
+        # (Expanded 10-tier deterministic heuristic based on tensor mean)
         tensor_mean = float(torch.mean(output).item())
 
-        if tensor_mean > 0.05:
+        if tensor_mean > 0.20:
+            status = "Excellent / Farm Fresh"
+            shelf_life = 72
+            confidence = 0.96
+        elif tensor_mean > 0.12:
+            status = "High Quality / Very Fresh"
+            shelf_life = 60
+            confidence = 0.94
+        elif tensor_mean > 0.07:
             status = "Fresh"
             shelf_life = 48
             confidence = 0.92
-        elif tensor_mean > 0.0:
+        elif tensor_mean > 0.04:
+            status = "Good Condition"
+            shelf_life = 36
+            confidence = 0.89
+        elif tensor_mean > 0.02:
+            status = "Fair / Acceptable"
+            shelf_life = 24
+            confidence = 0.87
+        elif tensor_mean > 0.00:
             status = "Redistribute Immediately"
             shelf_life = 12
             confidence = 0.85
+        elif tensor_mean > -0.03:
+            status = "Nearing Expiry / Urgent"
+            shelf_life = 6
+            confidence = 0.82
+        elif tensor_mean > -0.08:
+            status = "Questionable / Inspect Manually"
+            shelf_life = 2
+            confidence = 0.88
+        elif tensor_mean > -0.15:
+            status = "Spoiled / Unsafe"
+            shelf_life = 0
+            confidence = 0.95
         else:
-            status = "Spoiled / Compost"
+            status = "Severely Spoiled / Compost"
             shelf_life = 0
             confidence = 0.98
 
@@ -62,5 +92,8 @@ def assess_food_quality(image_url):
         print(json.dumps({"error": str(e)}))
 
 if __name__ == "__main__":
-    img_url = sys.argv[1]
-    assess_food_quality(img_url)
+    if len(sys.argv) > 1:
+        img_url = sys.argv[1]
+        assess_food_quality(img_url)
+    else:
+        print(json.dumps({"error": "No image path or URL provided"}))
