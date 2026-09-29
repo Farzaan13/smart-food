@@ -143,6 +143,30 @@
                                 </h3>
                             </div>
 
+                            <!-- ✅ AI QUALITY VERIFIER CARD ✅ -->
+                            <div class="p-3 mb-3 rounded border <%= food.qualityStatus === 'Fresh' ? 'bg-success-subtle border-success' : food.qualityStatus === 'Spoiled / Compost' ? 'bg-danger-subtle border-danger' : 'bg-warning-subtle border-warning' %>">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <small class="fw-bold"><i class="fa-solid fa-robot me-1"></i> AI Freshness Check</small>
+                                    <span class="badge <%= food.qualityStatus === 'Fresh' ? 'bg-success' : food.qualityStatus === 'Spoiled / Compost' ? 'bg-danger' : 'bg-warning text-dark' %>">
+                                        <%= food.qualityStatus || 'Pending Analysis' %>
+                                    </span>
+                                </div>
+
+                                <% if (food.shelfLifeHours !== null && food.shelfLifeHours !== undefined) { %>
+                                    <div class="small text-muted d-flex justify-content-between mb-1">
+                                        <span>Est. Shelf-life:</span>
+                                        <strong class="text-dark"><%= food.shelfLifeHours %> hrs</strong>
+                                    </div>
+                                <% } %>
+
+                                <% if (food.aiConfidence) { %>
+                                    <div class="small text-muted d-flex justify-content-between">
+                                        <span>Model Confidence:</span>
+                                        <strong class="text-dark"><%= (food.aiConfidence * 100).toFixed(0) %>%</strong>
+                                    </div>
+                                <% } %>
+                            </div>
+
                             <hr>
 
                             <!-- Kitchen -->
@@ -304,8 +328,8 @@
     <!-- ================================= -->
 
     <div class="mt-5">
-<div class="mb-4">
-    <h3 class="fw-bold mb-1"><i class="bi bi-box-seam me-1"></i> My Food Requests</h3>
+        <div class="mb-4">
+            <h3 class="fw-bold mb-1"><i class="bi bi-box-seam me-1"></i> My Food Requests</h3>
             <p class="text-muted mb-0">Track your food requests and delivery status.</p>
         </div>
 

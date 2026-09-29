@@ -88,6 +88,18 @@ const surplusFoodSchema = new mongoose.Schema(
                 "cancelled"
             ],
             default: "available"
+        },
+
+            qualityStatus: { 
+            type: String 
+        },
+        
+        shelfLifeHours: { 
+            type: Number 
+        },
+        
+        aiConfidence: { 
+            type: Number 
         }
     },
     {

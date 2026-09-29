@@ -1,5 +1,7 @@
 const SurplusFood = require("../models/SurplusFood");
 const cloudinary = require("../config/cloudinary");
+const qualityAssessment = require("../services/qualityAssessment");
+const ngoRecommendation = require("../services/ngoRecommendation");
 
 const getSurplusPage = async (req, res) => {
     try {
@@ -47,7 +49,9 @@ const createSurplusFood = async (req, res) => {
             pickupDeadline,
             description,
             pickupAddress,
-            city
+            city,
+            kitchenLat,
+            kitchenLon
         } = req.body;
 
 
@@ -153,9 +157,62 @@ const createSurplusFood = async (req, res) => {
 
 
         // =========================
+        // 🤖 AI VISION QUALITY CHECK
+        // (Cloudinary URL par chalega, image already upload ho chuki hai)
+        // =========================
+
+        let aiQuality = null;
+
+        if (imageData.url) {
+
+            try {
+
+                aiQuality = await qualityAssessment.analyzeFoodImage(
+                    imageData.url
+                );
+
+            } catch (aiError) {
+
+                console.error(
+                    "AI quality check failed:",
+                    aiError
+                );
+                // AI fail ho jaye to bhi listing create hoti rahegi
+            }
+        }
+
+
+        // =========================
+        // 🤖 AI NGO RECOMMENDATION
+        // =========================
+
+        let recommendedNgo = null;
+
+        try {
+
+            const lat = kitchenLat || 26.4499;
+            const lon = kitchenLon || 80.3319;
+
+            recommendedNgo = await ngoRecommendation.recommendNearestNGO(
+                lat,
+                lon
+            );
+
+        } catch (ngoError) {
+
+            console.error(
+                "NGO recommendation failed:",
+                ngoError
+            );
+        }
+
+
+        // =========================
         // CREATE SURPLUS
         // =========================
         console.log("IMAGE DATA:", imageData);
+        console.log("AI QUALITY:", aiQuality);
+        console.log("RECOMMENDED NGO:", recommendedNgo);
 
         await SurplusFood.create({
 
@@ -185,6 +242,18 @@ const createSurplusFood = async (req, res) => {
                 url: imageData.url,
                 filename: imageData.filename
             },
+
+            qualityStatus: aiQuality
+                ? aiQuality.quality_status
+                : "Pending Analysis",
+
+            shelfLifeHours: aiQuality
+                ? aiQuality.shelf_life_hours
+                : null,
+
+            aiConfidence: aiQuality
+                ? aiQuality.confidence_score
+                : null,
 
             status: "available"
 
