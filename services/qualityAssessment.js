@@ -1,10 +1,19 @@
+// services/qualityAssessment.js
 const { spawn } = require('child_process');
 const path = require('path');
 
 exports.analyzeFoodImage = (imagePath) => {
     return new Promise((resolve, reject) => {
         const scriptPath = path.join(__dirname, '../ml/assess_quality.py');
-        const pythonPath = path.join(__dirname, '../venv/Scripts/python.exe');
+
+        // Use PYTHON_PATH from env if set (for hosting), else fall back to local venv
+        const pythonPath = process.env.PYTHON_PATH || path.join(
+            __dirname,
+            '..',
+            'venv',
+            process.platform === 'win32' ? 'Scripts' : 'bin',
+            process.platform === 'win32' ? 'python.exe' : 'python'
+        );
 
         const pythonProcess = spawn(pythonPath, [scriptPath, imagePath]);
 
@@ -15,8 +24,13 @@ exports.analyzeFoodImage = (imagePath) => {
         });
 
         pythonProcess.stderr.on('data', (data) => {
-            // Log it, but DO NOT reject. PyTorch download progress bars show up here!
             console.warn(`Vision ML Log: ${data}`);
+        });
+
+        // ✅ IMPORTANT: handle spawn errors (missing python, bad path, etc.)
+        pythonProcess.on('error', (err) => {
+            console.error('Failed to start Python process:', err.message);
+            reject('Python not available on this environment');
         });
 
         pythonProcess.on('close', (code) => {
