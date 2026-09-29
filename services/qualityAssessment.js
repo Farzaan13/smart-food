@@ -6,14 +6,9 @@ exports.analyzeFoodImage = (imagePath) => {
     return new Promise((resolve, reject) => {
         const scriptPath = path.join(__dirname, '../ml/assess_quality.py');
 
-        // Use PYTHON_PATH from env if set (for hosting), else fall back to local venv
-        const pythonPath = process.env.PYTHON_PATH || path.join(
-            __dirname,
-            '..',
-            'venv',
-            process.platform === 'win32' ? 'Scripts' : 'bin',
-            process.platform === 'win32' ? 'python.exe' : 'python'
-        );
+        // Since Docker sets the ENV PATH, 'python3' will automatically use the venv on Render.
+        // If testing locally on Windows, you can add PYTHON_PATH=python in your local .env file.
+        const pythonPath = process.env.PYTHON_PATH || 'python3';
 
         const pythonProcess = spawn(pythonPath, [scriptPath, imagePath]);
 
@@ -24,10 +19,11 @@ exports.analyzeFoodImage = (imagePath) => {
         });
 
         pythonProcess.stderr.on('data', (data) => {
+            // Logs PyTorch progress bars without crashing the app
             console.warn(`Vision ML Log: ${data}`);
         });
 
-        // ✅ IMPORTANT: handle spawn errors (missing python, bad path, etc.)
+        // IMPORTANT: handle spawn errors (missing python, bad path, etc.)
         pythonProcess.on('error', (err) => {
             console.error('Failed to start Python process:', err.message);
             reject('Python not available on this environment');
